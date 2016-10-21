@@ -15,11 +15,12 @@ formatters = {
         logging.CRITICAL: logging.Formatter("%(filename)s:%(lineno)d | %(message)s\n")
         }
 
+host="134.158.75.161"
 port = 5558
 
 ctx = zmq.Context()
 pub = ctx.socket(zmq.PUB)
-pub.connect('tcp://127.0.0.1:%i' % port)
+pub.connect('tcp://%s:%i' % (host,port))
 logger = logging.getLogger("clientapp1")
 logger.setLevel(logging.INFO)
 handler = PUBHandler(pub)
@@ -31,7 +32,7 @@ if __name__=="__main__":
     logger = logging.getLogger()
     context = zmq.Context()
     socket_fd = context.socket(zmq.SUB)
-    socket_fd.bind("tcp://127.0.0.1:%s" % port)
+    socket_fd.bind('tcp://%s:%i' % (host,port))
     socket_fd.setsockopt(zmq.SUBSCRIBE, "")
     filehandler = logging.handlers.TimedRotatingFileHandler('var/log', 'midnight',1)
     logger.setLevel(logging.DEBUG)
