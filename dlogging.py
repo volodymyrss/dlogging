@@ -15,7 +15,8 @@ formatters = {
         logging.CRITICAL: logging.Formatter("%(filename)s:%(lineno)d | %(message)s\n")
         }
 
-host="134.158.75.161"
+host="localhost"
+#host="134.158.75.161"
 port = 5558
 
 ctx = zmq.Context()
