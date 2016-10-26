@@ -28,6 +28,10 @@ handler = PUBHandler(pub)
 handler.formatters = formatters
 logger.addHandler(handler)
 
+import socket
+
+def log(a,b):
+    return logger.log(a,socket.gethostname()+" | "+b)
 
 if __name__=="__main__":
     logger = logging.getLogger()
