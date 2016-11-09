@@ -30,8 +30,9 @@ logger.addHandler(handler)
 
 import socket
 
-def log(a,b):
-    return logger.log(a,socket.gethostname()+" | "+b)
+def log(a,b,**aa):
+    tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
+    return logger.log(a,socket.gethostname()+" | "+b+" "+tags)
 
 if __name__=="__main__":
     logger = logging.getLogger()
@@ -39,7 +40,7 @@ if __name__=="__main__":
     socket_fd = context.socket(zmq.SUB)
     socket_fd.bind('tcp://%s:%i' % (host,port))
     socket_fd.setsockopt(zmq.SUBSCRIBE, "")
-    filehandler = logging.handlers.TimedRotatingFileHandler('var/log', 'midnight',1)
+    filehandler = logging.handlers.TimedRotatingFileHandler('var/log/dlog.log', 'midnight',1)
     logger.setLevel(logging.DEBUG)
     filehandler.setLevel(logging.DEBUG)
     formatter = logging.Formatter('%(asctime)s | %(levelname)s | %(message)s')
