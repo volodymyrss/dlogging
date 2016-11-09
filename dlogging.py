@@ -30,9 +30,9 @@ logger.addHandler(handler)
 
 import socket
 
-def log(a,b,**aa):
+def log(level,message,**aa):
     tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
-    return logger.log(a,socket.gethostname()+" | "+b+" "+tags)
+    return logger.log(level,socket.gethostname()+" | "+message+" "+tags)
 
 if __name__=="__main__":
     logger = logging.getLogger()
