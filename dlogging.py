@@ -4,6 +4,7 @@ import random
 import time
 import zmq
 from zmq.log.handlers import PUBHandler
+import socket
 
 LOG_LEVELS = (logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.CRITICAL)
  
@@ -17,29 +18,45 @@ formatters = {
 
 host="127.0.0.1"
 #host="134.158.75.161"
-port = 5558
+port = 5556
 
-ctx = zmq.Context()
-pub = ctx.socket(zmq.PUB)
-pub.connect('tcp://%s:%i' % (host,port))
-logger = logging.getLogger("clientapp1")
-logger.setLevel(logging.INFO)
-handler = PUBHandler(pub)
-handler.formatters = formatters
-logger.addHandler(handler)
+class LoggerClass(object):
+    logger=None
 
-import socket
+    def connect(self):
+        ctx = zmq.Context()
+        pub = ctx.socket(zmq.PUB)
+        pub.bind('tcp://%s:%i' % (host,port))
+
+        self.logger = logging.getLogger("clientapp1")
+        self.logger.setLevel(logging.DEBUG)
+        handler = PUBHandler(pub)
+        handler.formatters = formatters
+        self.logger.addHandler(handler)
+        time.sleep(1.)
+    
+#
+#    for i in range(10):
+#        logger.log(logging.INFO,socket.gethostname()+" | test")
+#        time.sleep(1)
+
+Logger=LoggerClass()
 
 def log(level,message,**aa):
     tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
-    return logger.log(level,socket.gethostname()+" | "+message+" "+tags)
+    return Logger.logger.log(level,socket.gethostname()+" | "+message+" "+tags)
 
 if __name__=="__main__":
+    print "get"
     logger = logging.getLogger()
+
     context = zmq.Context()
     socket_fd = context.socket(zmq.SUB)
-    socket_fd.bind('tcp://%s:%i' % (host,port))
+    socket_fd.connect('tcp://%s:%i' % (host,port))
     socket_fd.setsockopt(zmq.SUBSCRIBE, "")
+
+    print "socket",socket_fd,'tcp://%s:%i' % (host,port)
+
     filehandler = logging.handlers.TimedRotatingFileHandler('var/log/dlog.log', 'midnight',1)
     logger.setLevel(logging.DEBUG)
     filehandler.setLevel(logging.DEBUG)
@@ -47,7 +64,9 @@ if __name__=="__main__":
     filehandler.setFormatter(formatter)
     logger.addHandler(filehandler)
     while True:
-        topic, message = socket_fd.recv_multipart()
+        m=socket_fd.recv_multipart()
+        topic,message=m
+        print m
         pos = topic.find('.')
         level = topic
         if pos > 0: level = topic[:pos]
@@ -55,3 +74,5 @@ if __name__=="__main__":
         log_msg = getattr(logging, level.lower())
         if pos > 0: message = topic[pos+1:] + " | " + message
         log_msg(message)
+else:
+    Logger.connect()
