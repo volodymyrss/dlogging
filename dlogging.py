@@ -26,7 +26,7 @@ class LoggerClass(object):
     def connect(self):
         ctx = zmq.Context()
         pub = ctx.socket(zmq.PUB)
-        pub.bind('tcp://%s:%i' % (host,port))
+        pub.connect('tcp://%s:%i' % (host,port))
 
         self.logger = logging.getLogger("clientapp1")
         self.logger.setLevel(logging.DEBUG)
@@ -52,7 +52,7 @@ if __name__=="__main__":
 
     context = zmq.Context()
     socket_fd = context.socket(zmq.SUB)
-    socket_fd.connect('tcp://%s:%i' % (host,port))
+    socket_fd.bind('tcp://%s:%i' % (host,port))
     socket_fd.setsockopt(zmq.SUBSCRIBE, "")
 
     print "socket",socket_fd,'tcp://%s:%i' % (host,port)
