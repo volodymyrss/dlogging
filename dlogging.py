@@ -20,31 +20,31 @@ host="127.0.0.1"
 #host="134.158.75.161"
 port = 5558
 
-class LoggerClass(object):
-    logger=None
+#class LoggerClass(object):
+#    logger=None
 
-    def connect(self):
-        ctx = zmq.Context()
-        pub = ctx.socket(zmq.PUB)
-        pub.connect('tcp://%s:%i' % (host,port))
+#    def connect(self):
+ctx = zmq.Context()
+pub = ctx.socket(zmq.PUB)
+pub.connect('tcp://%s:%i' % (host,port))
 
-        self.logger = logging.getLogger("clientapp1")
-        self.logger.setLevel(logging.DEBUG)
-        handler = PUBHandler(pub)
-        handler.formatters = formatters
-        self.logger.addHandler(handler)
-        time.sleep(1.)
+logger = logging.getLogger("clientapp1")
+logger.setLevel(logging.DEBUG)
+handler = PUBHandler(pub)
+handler.formatters = formatters
+logger.addHandler(handler)
+time.sleep(1.)
     
 #
 #    for i in range(10):
 #        logger.log(logging.INFO,socket.gethostname()+" | test")
 #        time.sleep(1)
 
-Logger=LoggerClass()
+#Logger=LoggerClass()
 
 def log(level,message,**aa):
     tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
-    return Logger.logger.log(level,socket.gethostname()+" | "+message+" "+tags)
+    return logger.log(level,socket.gethostname()+" | "+message+" "+tags)
 
 if __name__=="__main__":
     print "get"
@@ -74,5 +74,5 @@ if __name__=="__main__":
         log_msg = getattr(logging, level.lower())
         if pos > 0: message = topic[pos+1:] + " | " + message
         log_msg(message)
-else:
-    Logger.connect()
+#else:
+#    Logger.connect()
