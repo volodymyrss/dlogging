@@ -5,6 +5,7 @@ import time
 import zmq
 from zmq.log.handlers import PUBHandler
 import socket
+import os
 
 LOG_LEVELS = (logging.DEBUG, logging.INFO, logging.WARN, logging.ERROR, logging.CRITICAL)
  
@@ -16,33 +17,21 @@ formatters = {
         logging.CRITICAL: logging.Formatter("%(filename)s:%(lineno)d | %(message)s\n")
         }
 
-host="127.0.0.1"
-#host="134.158.75.161"
-port = 5558
+host = os.environ.get('DLOGGING_SERVER_HOST','127.0.0.1')
+port = int(os.environ.get('DLOGGING_SERVER_PORT',5552))
 
-#class LoggerClass(object):
-#    logger=None
-
-#    def connect(self):
 ctx = zmq.Context()
 pub = ctx.socket(zmq.PUB)
 pub.connect('tcp://%s:%i' % (host,port))
 
-logger = logging.getLogger("clientapp1")
+logger = logging.getLogger("default")
 logger.setLevel(logging.DEBUG)
 handler = PUBHandler(pub)
 handler.formatters = formatters
 logger.addHandler(handler)
 time.sleep(1.)
-    
-#
-#    for i in range(10):
-#        logger.log(logging.INFO,socket.gethostname()+" | test")
-#        time.sleep(1)
 
-#Logger=LoggerClass()
-
-def log(level,message,**aa):
+def log(message,level=logging.DEBUG,**aa):
     tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
     return logger.log(level,socket.gethostname()+" | "+message+" "+tags)
 
@@ -74,5 +63,3 @@ if __name__=="__main__":
         log_msg = getattr(logging, level.lower())
         if pos > 0: message = topic[pos+1:] + " | " + message
         log_msg(message)
-#else:
-#    Logger.connect()
