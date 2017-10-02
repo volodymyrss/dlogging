@@ -33,7 +33,7 @@ time.sleep(1.)
 
 def log(message,level=logging.DEBUG,**aa):
     tags=" ".join(["{%s:%s}"%(repr(a),repr(b)) for a,b in aa.items()])
-    return logger.log(level,socket.gethostname()+" | "+message+" "+tags)
+    return logger.log(level,repr(socket.gethostname())+" | "+repr(message)+" "+tags)
 
 if __name__=="__main__":
     print "get"
